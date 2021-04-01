@@ -8,7 +8,7 @@ Death Music IV is a simple mod where when you die, a random music track will be 
 You can add you own music as well! Just drag & drop any of your .mp3 or .wav file into the DeathMusicIV folder and your music is now implemented!  
 
 ## Episode Specific Music
-You can also add the following prefixes to the beginning of your music filename: *gtaiv_***, *tbogt_*** and *tlad_*** if you play for example The Lost And Damned, only the files with *tlad_*** at the beginning will be played. The same applies for GTAIV and TBOGT. If you dont give your file a prefix, then this file is going to be a general file. General files are being played when there are no files with a prefix for the specific episode.
+You can also add the following prefixes to the beginning of your music filename: *gtaiv_**, *tbogt_** and *tlad_** if you play for example The Lost And Damned, only the files with *tlad_*** at the beginning will be played. The same applies for GTAIV and TBOGT. If you dont give your file a prefix, then this file is going to be a general file. General files are being played when there are no files with a prefix for the specific episode.
 
 * : Any filename  
 
