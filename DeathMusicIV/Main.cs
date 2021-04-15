@@ -1,5 +1,5 @@
 ﻿// DeathMusicIV by ItsClonkAndre
-// Version 1.2
+// Version 1.4
 
 using System;
 using System.Collections.Generic;
@@ -20,6 +20,7 @@ namespace DeathMusicIV {
         private bool fadeOut;
         private bool fadeIn;
         private bool playWhenNearDeath;
+        //private bool alsoPlayDeathMusicWhenNearDeathIsActive;
 
         private int fadingSpeed;
         private int initalVolume;
@@ -131,48 +132,82 @@ namespace DeathMusicIV {
             Bass.BASS_ChannelSlideAttribute(stream, BASSAttribute.BASS_ATTRIB_VOL, fadeToVolumeLevel / 100.0f, fadingSpeed);
         }
 
+        private int GetEpisodicSpecificMusicHandle()
+        {
+            switch (Game.CurrentEpisode) {
+                case GameEpisode.GTAIV:
+                    string[] ivSoundtracks = musicFiles.Where(file => Path.GetFileNameWithoutExtension(file).ToLower().StartsWith("gtaiv_")).ToArray();
+                    if (ivSoundtracks.Length != 0) {
+                        string rFile = ivSoundtracks[rnd.Next(0, ivSoundtracks.Length)];
+                        return CreateFile(rFile, fadeIn);
+                    }
+                    break;
+                case GameEpisode.TBOGT:
+                    string[] tbogtSoundtracks = musicFiles.Where(file => Path.GetFileNameWithoutExtension(file).ToLower().StartsWith("tbogt_")).ToArray();
+                    if (tbogtSoundtracks.Length != 0) {
+                        string rFile = tbogtSoundtracks[rnd.Next(0, tbogtSoundtracks.Length)];
+                        return CreateFile(rFile, fadeIn);
+                    }
+                    break;
+                case GameEpisode.TLAD:
+                    string[] tladSoundtracks = musicFiles.Where(file => Path.GetFileNameWithoutExtension(file).ToLower().StartsWith("tlad_")).ToArray();
+                    if (tladSoundtracks.Length != 0) {
+                        string rFile = tladSoundtracks[rnd.Next(0, tladSoundtracks.Length)];
+                        return CreateFile(rFile, fadeIn);
+                    }
+                    break;
+            }
+            return 0;
+        }
         private void PlayRandomSoundtrack()
         {
             try {
-                switch (Game.CurrentEpisode) {
-                    case GameEpisode.GTAIV:
-                        string[] ivSoundtracks = musicFiles.Where(file => Path.GetFileNameWithoutExtension(file).ToLower().StartsWith("gtaiv_")).ToArray();
-
-                        if (ivSoundtracks.Length != 0) {
-                            string rFile = ivSoundtracks[rnd.Next(0, ivSoundtracks.Length)];
-                            musicHandle = CreateFile(rFile, fadeIn);
-                        }
-
-                        break;
-                    case GameEpisode.TBOGT:
-                        string[] tbogtSoundtracks = musicFiles.Where(file => Path.GetFileNameWithoutExtension(file).ToLower().StartsWith("tbogt_")).ToArray();
-
-                        if (tbogtSoundtracks.Length != 0) {
-                            string rFile = tbogtSoundtracks[rnd.Next(0, tbogtSoundtracks.Length)];
-                            musicHandle = CreateFile(rFile, fadeIn);
-                        }
-
-                        break;
-                    case GameEpisode.TLAD:
-                        string[] tladSoundtracks = musicFiles.Where(file => Path.GetFileNameWithoutExtension(file).ToLower().StartsWith("tlad_")).ToArray();
-
-                        if (tladSoundtracks.Length != 0) {
-                            string rFile = tladSoundtracks[rnd.Next(0, tladSoundtracks.Length)];
-                            musicHandle = CreateFile(rFile, fadeIn);
-                        }
-
-                        break;
+                if (playWhenNearDeath) {
+                    switch (Game.CurrentEpisode) {
+                        case GameEpisode.GTAIV:
+                            string[] nearDeathSoundtracksGTAIV = musicFiles.Where(file => Path.GetFileNameWithoutExtension(file).ToLower().StartsWith("lh_gtaiv_")).ToArray();
+                            if (nearDeathSoundtracksGTAIV.Length != 0) {
+                                string rFile = nearDeathSoundtracksGTAIV[rnd.Next(0, nearDeathSoundtracksGTAIV.Length)];
+                                musicHandle = CreateFile(rFile, fadeIn);
+                            }
+                            break;
+                        case GameEpisode.TBOGT:
+                            string[] nearDeathSoundtracksTBOGT = musicFiles.Where(file => Path.GetFileNameWithoutExtension(file).ToLower().StartsWith("lh_tbogt_")).ToArray();
+                            if (nearDeathSoundtracksTBOGT.Length != 0) {
+                                string rFile = nearDeathSoundtracksTBOGT[rnd.Next(0, nearDeathSoundtracksTBOGT.Length)];
+                                musicHandle = CreateFile(rFile, fadeIn);
+                            }
+                            break;
+                        case GameEpisode.TLAD:
+                            string[] nearDeathSoundtracksTLAD = musicFiles.Where(file => Path.GetFileNameWithoutExtension(file).ToLower().StartsWith("lh_tlad_")).ToArray();
+                            if (nearDeathSoundtracksTLAD.Length != 0) {
+                                string rFile = nearDeathSoundtracksTLAD[rnd.Next(0, nearDeathSoundtracksTLAD.Length)];
+                                musicHandle = CreateFile(rFile, fadeIn);
+                            }
+                            break;
+                    }
+                }
+                else {
+                    musicHandle = GetEpisodicSpecificMusicHandle();
                 }
 
-                if (musicHandle != 0) { // Switch statement was successful and found soundtrack for a specific episode
-                    if (fadeIn)  {
+                if (musicHandle == 0) {
+                    string[] nearDeathSoundtracksAny = musicFiles.Where(file => Path.GetFileNameWithoutExtension(file).ToLower().StartsWith("lh_")).ToArray();
+                    if (nearDeathSoundtracksAny.Length != 0) {
+                        string rFile = nearDeathSoundtracksAny[rnd.Next(0, nearDeathSoundtracksAny.Length)];
+                        musicHandle = CreateFile(rFile, fadeIn);
+                    }
+                }
+
+                if (musicHandle != 0) {
+                    if (fadeIn) {
                         FadeStreamIn(musicHandle, initalVolume, fadingSpeed);
                     }
                     else {
                         Bass.BASS_ChannelPlay(musicHandle, false);
                     }
                 }
-                else { // Get random file
+                else { // Get random file if musicHandle is zero
                     List<string> files = new List<string>();
                     for (int i = 0; i < musicFiles.Length; i++) {
                         string filename = Path.GetFileNameWithoutExtension(musicFiles[i]).ToLower();
@@ -236,6 +271,7 @@ namespace DeathMusicIV {
                 fadeIn = Settings.GetValueBool("FadeIn", "Music", true);
                 fadingSpeed = Settings.GetValueInteger("FadingSpeed", "Music", 3000);
                 playWhenNearDeath = Settings.GetValueBool("PlayWhenNearDeath", "Music", false);
+                //alsoPlayDeathMusicWhenNearDeathIsActive = Settings.GetValueBool("AlsoPlayDeathMusicWhenNearDeathIsActive", "Music", true);
                 nearDeathHealth = Settings.GetValueInteger("NearDeathHealth", "Music", 15);
                 initalVolume = Settings.GetValueInteger("Volume", "Music", 20);
 
