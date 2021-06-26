@@ -10,7 +10,7 @@ You can add you own music as well! Just drag & drop any of your .mp3 or .wav fil
 ## Episode Specific Music
 You can also add the following prefixes to the beginning of your music filename: *gtaiv_~*, *tbogt_~* and *tlad_~* if you play for example The Lost And Damned, only the files with *tlad_~* at the beginning will be played. The same applies for GTAIV and TBOGT. If you dont give your file a prefix, then this file is going to be a general file. General files are being played when there are no files with a prefix for the specific episode.
 
-~ : Any filename  
+"**~**" : *Any filename*  
 
 Little Example:  
 *Death_1.mp3 - Death_6.mp3* are general files because they have no prefix and can be played in every episode if there are no soundtracks for the specific episode.  
